@@ -1,0 +1,12 @@
+{
+  "tool": "linkedin-unfollower",
+  "version": "0.1.0",
+  "exportedAt": "2026-11-25T09:00:00.000Z",
+  "source": "https://www.linkedin.com/mynetwork/network-manager/company/",
+  "companies": [
+    { "name": "Acme Corp", "slug": "acme-corp", "urn": "urn:li:fsd_company:1001", "id": "1001", "url": "https://www.linkedin.com/company/acme-corp/" },
+    { "name": "Globex", "slug": "globex", "urn": "urn:li:fsd_company:1002", "id": "1002", "url": "https://www.linkedin.com/company/globex/" },
+    { "name": "Initech", "slug": "initech", "urn": "urn:li:fsd_company:1003", "id": "1003", "url": "https://www.linkedin.com/company/initech/" },
+    { "name": "No Urn Here", "slug": "no-urn", "urn": null, "id": null, "url": "https://www.linkedin.com/company/no-urn/" }
+  ]
+}

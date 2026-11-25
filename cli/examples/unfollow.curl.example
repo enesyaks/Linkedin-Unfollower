@@ -1,0 +1,14 @@
+# Captured from the browser: DevTools -> Network -> the unfollow request
+# -> right click -> Copy -> Copy as cURL.
+#
+# Then replace the company identifier in the body (or URL) with {urn}.
+# This file is NOT a working LinkedIn request: it is a shape, with a fake host.
+# Your own capture is the real thing, and it contains your session cookie.
+curl 'https://example.invalid/voyager/api/REPLACE-ME/follows?action=unfollow' \
+  -H 'accept: application/vnd.linkedin.normalized+json+2.1' \
+  -H 'content-type: application/json; charset=UTF-8' \
+  -H 'csrf-token: ajax:0000000000000000000' \
+  -H 'x-restli-protocol-version: 2.0.0' \
+  -H 'cookie: li_at=PASTE-YOUR-OWN; JSESSIONID="ajax:0000000000000000000"' \
+  --data-raw '{"urn":"{urn}"}' \
+  --compressed

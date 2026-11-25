@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  rust:
+    name: Rust
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cli
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: cli
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test
+      - run: cargo build --release
+
+  javascript:
+    name: JavaScript
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: node --check web/unfollow.js
+      - run: node web/test/unfollow.test.mjs
+
+  secrets:
+    name: No credentials committed
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject session cookies and real URNs in tracked files
+        run: |
+          set -e
+          # li_at values are ~200 chars; the examples use obvious placeholders.
+          if grep -rInE 'li_at=[A-Za-z0-9_-]{40,}' --exclude-dir=.git .; then
+            echo "::error::a real li_at cookie is committed"; exit 1
+          fi
+          if git ls-files | grep -E '\.curl$'; then
+            echo "::error::a capture file is committed"; exit 1
+          fi

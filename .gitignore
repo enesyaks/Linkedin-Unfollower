@@ -1,0 +1,19 @@
+# Rust
+/cli/target/
+**/*.rs.bk
+
+# Captured requests contain your LinkedIn session cookie. Never commit them.
+*.curl
+*.curl.txt
+!*.curl.example
+
+# Your own exported company list and run progress.
+companies.json
+liunfollow-state.json
+*-state.json
+*.json.tmp
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/

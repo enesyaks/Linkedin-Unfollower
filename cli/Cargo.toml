@@ -1,0 +1,28 @@
+[package]
+name = "liunfollow"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+description = "Replay one captured LinkedIn unfollow request across a list of companies, slowly and resumably."
+license = "MIT"
+repository = "https://github.com/your-name/linkedin-unfollower"
+keywords = ["linkedin", "cli", "rate-limit", "automation"]
+categories = ["command-line-utilities"]
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+regex = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time"] }
+
+[dependencies.reqwest]
+version = "0.12"
+default-features = false
+features = ["rustls-tls", "gzip"]
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
