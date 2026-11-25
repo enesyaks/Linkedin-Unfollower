@@ -13,7 +13,8 @@ liunfollow-state.json
 *-state.json
 *.json.tmp
 
-# OS / editors
+# OS / editors / local session config
 .DS_Store
 .idea/
 .vscode/
+.claude/

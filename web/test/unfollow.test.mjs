@@ -94,6 +94,21 @@ test('a company name is recovered from the aria-label when there is no link', as
   teardown();
 });
 
+test('a populated cache is not mistaken for a completed scan', async () => {
+  // Regression: the panel asked "is CACHE empty?" to decide whether to scan.
+  // ensureScanned() fills CACHE from whatever is already rendered, so the
+  // answer was always no and the panel showed only the first page.
+  const { LIU, teardown } = boot();
+  const restore = quiet();
+  LIU.list();                       // populates CACHE via ensureScanned()
+  restore();
+  assert.ok(LIU.companies.length > 0, 'cache should be populated');
+  assert.equal(LIU.scanned, false, 'but no full scan has run yet');
+  await LIU.scan({ quiet: true });
+  assert.equal(LIU.scanned, true);
+  teardown();
+});
+
 test('export produces the schema the Rust CLI consumes', async () => {
   const { LIU, teardown } = boot();
   await LIU.scan({ quiet: true });

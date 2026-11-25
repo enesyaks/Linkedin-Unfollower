@@ -17,7 +17,26 @@ no-op clock. The JavaScript tests run against a small hand-rolled fake DOM in
 make lint
 ```
 
-`cargo fmt --check` and `cargo clippy -D warnings` both have to pass.
+`cargo fmt --check` and `cargo clippy -D warnings` both have to pass. There is
+no CI; run these yourself before opening a pull request.
+
+## Working on the panel
+
+`web/test/fixture.html` is a local stand-in for LinkedIn's companies page. It
+copies the real markup — obfuscated container classes, `data-entity-urn`, a
+numeric `/company/<id>/` link, and a button whose visible text is `Following`
+while its aria-label is `Click to stop following <Company>`. Serve the repo and
+open it:
+
+```bash
+python3 -m http.server 8899
+```
+
+Then go to <http://127.0.0.1:8899/web/test/fixture.html>. The page loads
+`web/unfollow.js` directly, so the panel opens on load and you can click
+through a full run — select, confirm, watch progress, resume — without
+touching a real account. Speed it up from the console with
+`LIU.config({ minDelay: 200, maxDelay: 300, scrollDelay: 200 })`.
 
 ## Things that do not belong in this repository
 
