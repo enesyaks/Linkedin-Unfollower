@@ -7,8 +7,8 @@
 <meta name="description" content="Copy one file, paste it into your browser console, and a panel opens that unfollows LinkedIn companies in bulk — slowly, resumably, no extension required.">
 <meta property="og:title" content="linkedin-unfollower">
 <meta property="og:description" content="Unfollow hundreds of LinkedIn companies without clicking hundreds of times. Copy, paste, done.">
-<meta property="og:image" content="https://enesyaks.github.io/linkedin-unfollower/docs/img/panel.png">
-<meta property="og:url" content="https://enesyaks.github.io/linkedin-unfollower/">
+<meta property="og:image" content="https://enesyaks.github.io/Linkedin-Unfollower/docs/img/panel.png">
+<meta property="og:url" content="https://enesyaks.github.io/Linkedin-Unfollower/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧹</text></svg>">
@@ -121,7 +121,7 @@
   <div class="card">
     <p class="note" data-i="trust1">You should not run code you have not read, especially not next to a logged-in
       account. That is why this is plain, commented JavaScript rather than a minified blob — read it below, or on
-      <a href="https://github.com/enesyaks/linkedin-unfollower" target="_blank" rel="noopener">GitHub</a>.</p>
+      <a href="https://github.com/enesyaks/Linkedin-Unfollower" target="_blank" rel="noopener">GitHub</a>.</p>
     <p class="note" data-i="trust2">It talks to nothing but LinkedIn: no server, no analytics, no account, no network
       request of its own. It clicks the same buttons you would, and remembers what it finished in your browser's
       own storage.</p>
@@ -133,7 +133,7 @@
   </details>
 
   <footer>
-    <p><a href="https://github.com/enesyaks/linkedin-unfollower" target="_blank" rel="noopener">Source on GitHub</a>
+    <p><a href="https://github.com/enesyaks/Linkedin-Unfollower" target="_blank" rel="noopener">Source on GitHub</a>
       · MIT · <span data-i="foot">built because unfollowing 135 companies by hand is not a good afternoon</span></p>
   </footer>
 </div>
@@ -155,7 +155,7 @@ const TR = {
   again1: '<a href="https://www.tampermonkey.net/" target="_blank" rel="noopener">Tampermonkey</a> ya da <a href="https://violentmonkey.github.io/" target="_blank" rel="noopener">Violentmonkey</a> kur, sonra <a href="web/unfollow.js">dosyayı aç</a> — zaten geçerli bir userscript, yöneticin kurmayı önerir. Ondan sonra panel sayfaya her girdiğinde kendiliğinden açılır.',
   again2: 'Ya da Chrome DevTools snippet olarak bir kez kaydet: <b>Sources → Snippets → New snippet</b>, yapıştır, kaydet, sonra <kbd>⌘</kbd><kbd>⏎</kbd> ile çalıştır.',
   'h-trust': 'Kendi oturumuna kod yapıştırmadan önce',
-  trust1: 'Okumadığın kodu, hele giriş yapmış bir hesabın yanında, çalıştırmamalısın. Bu yüzden burada sıkıştırılmış bir blob değil, yorum satırlı düz JavaScript var — aşağıdan ya da <a href="https://github.com/enesyaks/linkedin-unfollower" target="_blank" rel="noopener">GitHub’dan</a> oku.',
+  trust1: 'Okumadığın kodu, hele giriş yapmış bir hesabın yanında, çalıştırmamalısın. Bu yüzden burada sıkıştırılmış bir blob değil, yorum satırlı düz JavaScript var — aşağıdan ya da <a href="https://github.com/enesyaks/Linkedin-Unfollower" target="_blank" rel="noopener">GitHub’dan</a> oku.',
   trust2: 'LinkedIn dışında hiçbir yere bağlanmaz: sunucu yok, analitik yok, hesap yok, kendine ait tek bir ağ isteği yok. Senin basacağın butonlara basar ve neyi bitirdiğini tarayıcının kendi deposunda tutar.',
   read: 'Önce dosyanın tamamını oku',
   sub: '',
@@ -173,10 +173,10 @@ function kb(n) { return (n / 1024).toFixed(1) + ' KB'; }
 
 const SUB = {
   en: () => SOURCE
-    ? `${kb(SOURCE.length)} of readable JavaScript · no build step · <a href="https://github.com/enesyaks/linkedin-unfollower/blob/main/web/unfollow.js" target="_blank" rel="noopener">view on GitHub</a>`
+    ? `${kb(SOURCE.length)} of readable JavaScript · no build step · <a href="https://github.com/enesyaks/Linkedin-Unfollower/blob/main/web/unfollow.js" target="_blank" rel="noopener">view on GitHub</a>`
     : 'Loading the file…',
   tr: () => SOURCE
-    ? `${kb(SOURCE.length)} okunabilir JavaScript · derleme yok · <a href="https://github.com/enesyaks/linkedin-unfollower/blob/main/web/unfollow.js" target="_blank" rel="noopener">GitHub’da gör</a>`
+    ? `${kb(SOURCE.length)} okunabilir JavaScript · derleme yok · <a href="https://github.com/enesyaks/Linkedin-Unfollower/blob/main/web/unfollow.js" target="_blank" rel="noopener">GitHub’da gör</a>`
     : 'Dosya yükleniyor…',
 };
 

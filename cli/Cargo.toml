@@ -6,7 +6,7 @@ rust-version = "1.75"
 description = "Replay one captured LinkedIn unfollow request across a list of companies, slowly and resumably."
 license = "MIT"
 authors = ["Enes"]
-repository = "https://github.com/enesyaks/linkedin-unfollower"
+repository = "https://github.com/enesyaks/Linkedin-Unfollower"
 keywords = ["linkedin", "cli", "rate-limit", "automation"]
 categories = ["command-line-utilities"]
 

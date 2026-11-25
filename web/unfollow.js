@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         linkedin-unfollower
-// @namespace    https://github.com/enesyaks/linkedin-unfollower
+// @namespace    https://github.com/enesyaks/Linkedin-Unfollower
 // @version      0.1.0
 // @description  List and bulk-unfollow the companies you follow on LinkedIn, slowly and resumably.
 // @author       Enes
@@ -24,7 +24,7 @@
  * slowly and politely, by driving the real UI.
  *
  * License: MIT
- * Source:  https://github.com/enesyaks/linkedin-unfollower
+ * Source:  https://github.com/enesyaks/Linkedin-Unfollower
  *
  * HOW TO USE
  *   1. Open https://www.linkedin.com/mynetwork/network-manager/company/
@@ -600,6 +600,12 @@
       doneBadge: 'done',
       failBadge: 'failed',
       empty: 'No companies match.',
+      unfollowing: 'Unfollowing',
+      allDone: (ok) => `${ok} unfollowed`,
+      someFailed: (ok, bad) => `${ok} unfollowed, ${bad} failed`,
+      hiddenWarn: 'Keep this tab visible — browsers slow down timers in background tabs.',
+      titleRunning: (i, n) => `(${i}/${n}) Unfollowing…`,
+      titleDone: (ok) => `✓ ${ok} unfollowed`,
     },
     tr: {
       title: 'Şirketleri takipten çıkar',
@@ -626,6 +632,12 @@
       doneBadge: 'bitti',
       failBadge: 'hata',
       empty: 'Eşleşen şirket yok.',
+      unfollowing: 'Takipten çıkarılıyor',
+      allDone: (ok) => `${ok} şirket çıkarıldı`,
+      someFailed: (ok, bad) => `${ok} çıkarıldı, ${bad} hata`,
+      hiddenWarn: 'Bu sekme görünür kalsın — tarayıcılar arka plandaki sekmelerde zamanlayıcıları yavaşlatır.',
+      titleRunning: (i, n) => `(${i}/${n}) Takipten çıkarılıyor…`,
+      titleDone: (ok) => `✓ ${ok} çıkarıldı`,
     },
   };
 
@@ -678,6 +690,37 @@
     .row.is-busy .badge { background: #ffe8a3; color: #6b4e00; }
     .empty { padding: 18px 12px; text-align: center; color: #6b7280; font-size: 13px; }
     .status { padding: 8px 12px 0; font-size: 12px; color: #41464b; min-height: 18px; }
+
+    /* The breathing "working on it" indicator. */
+    .live { display: none; align-items: center; gap: 8px; padding: 10px 12px 0; font-size: 13px; }
+    .live.on { display: flex; }
+    .live .dot { width: 9px; height: 9px; border-radius: 50%; background: #d9880a; flex: none;
+      animation: liu-breathe 1.7s ease-in-out infinite; }
+    .live .what { font-weight: 600; }
+    .live .who { color: #6b7280; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    @keyframes liu-breathe {
+      0%, 100% { opacity: .3; transform: scale(.75); box-shadow: 0 0 0 0 rgba(217,136,10,.45); }
+      50%      { opacity: 1;  transform: scale(1.1); box-shadow: 0 0 0 5px rgba(217,136,10,0); }
+    }
+    /* Finished: the dot settles, everything goes green. */
+    .live.ok .dot { background: #15692c; animation: none; opacity: 1; transform: none; }
+    .live.ok .what { color: #15692c; }
+    .live.warn .dot { background: #b32d2d; animation: none; opacity: 1; transform: none; }
+    .live.warn .what { color: #b32d2d; }
+    .panel.finished .head { background: #15692c; }
+    .panel.finished-warn .head { background: #8c1d1d; }
+    .bar i.ok { background: #15692c; }
+    @keyframes liu-flash {
+      from { background: rgba(21,105,44,.30); }
+      to   { background: transparent; }
+    }
+    .row.just-done { animation: liu-flash 1.3s ease-out; }
+    .hidden-warn { display: none; padding: 6px 12px 0; font-size: 12px; color: #8a6100; }
+    .hidden-warn.on { display: block; }
+    @media (prefers-reduced-motion: reduce) {
+      .live .dot { animation: none; opacity: 1; transform: none; }
+      .row.just-done { animation: none; }
+    }
     .bar { height: 3px; background: #edeff2; margin: 8px 12px 0; border-radius: 2px; overflow: hidden; }
     .bar i { display: block; height: 100%; width: 0; background: #0a66c2; transition: width .3s; }
     .foot { display: flex; gap: 6px; padding: 10px 12px; align-items: center; }
@@ -696,6 +739,12 @@
       .row:hover { background: #262f36; }
       .row.is-busy { background: #38331f; }
       .status, .hint, .empty { color: #a3abb4; }
+      .live .who { color: #a3abb4; }
+      .live.ok .what { color: #5bc47d; }
+      .live.ok .dot { background: #5bc47d; }
+      .panel.finished .head { background: #1d6b32; }
+      .bar i.ok { background: #5bc47d; }
+      .hidden-warn { color: #e0b44a; }
       .bar { background: #2f3a42; }
     }
   `;
@@ -770,6 +819,29 @@
       }
     }
 
+    let savedTitle = null;
+
+    /** Mirrors progress into the tab title, so a background tab still shows it. */
+    function setTitle(text) {
+      if (typeof document === 'undefined') return;
+      if (savedTitle === null) savedTitle = document.title;
+      document.title = text === null ? savedTitle : text;
+      if (text === null) savedTitle = null;
+    }
+
+    function setLive(state, what, who) {
+      if (!els.live) return;
+      els.live.className = 'live' + (state ? ' ' + state : '') + (what ? ' on' : '');
+      els.liveWhat.textContent = what || '';
+      els.liveWho.textContent = who || '';
+    }
+
+    function checkHidden() {
+      if (!els.hiddenWarn) return;
+      const hide = !RUNNING || !document.hidden;
+      els.hiddenWarn.className = 'hidden-warn' + (hide ? '' : ' on');
+    }
+
     function disarm() {
       armed = false;
       if (armTimer) clearTimeout(armTimer);
@@ -814,22 +886,38 @@
           row.querySelector('.badge').textContent = '…';
           row.scrollIntoView({ block: 'nearest' });
         }
+        setLive('', T().unfollowing, ev.entry.name);
+        setTitle(T().titleRunning(ev.index + 1, ev.total));
         els.status.textContent = T().progress(ev.index + 1, ev.total);
         els.bar.style.width = `${Math.round((ev.index / ev.total) * 100)}%`;
+        checkHidden();
       } else if (ev.phase === 'result') {
         const row = rowEls.get(ev.entry.key);
         if (row) {
-          row.className = 'row ' + (ev.result.ok ? 'is-done' : 'is-fail');
+          row.className =
+            'row ' + (ev.result.ok ? 'is-done just-done' : 'is-fail');
           row.querySelector('.badge').textContent = ev.result.ok
             ? T().doneBadge
             : T().failBadge;
         }
         els.bar.style.width = `${Math.round(((ev.index + 1) / ev.total) * 100)}%`;
-      } else if (ev.phase === 'pause') {
-        els.status.textContent = T().pausing(Math.round(ev.ms / 1000));
+      } else if (ev.phase === 'pause' || ev.phase === 'wait') {
+        // Keep breathing through the gaps; the run has not stopped.
+        if (ev.phase === 'pause') {
+          els.status.textContent = T().pausing(Math.round(ev.ms / 1000));
+        }
       } else if (ev.phase === 'done') {
-        els.status.textContent = T().finished(ev.ok, ev.failed);
+        const clean = ev.failed === 0 && ev.ok > 0;
+        setLive(clean ? 'ok' : 'warn',
+          clean ? T().allDone(ev.ok) : T().someFailed(ev.ok, ev.failed), '');
+        els.panel.classList.add(clean ? 'finished' : 'finished-warn');
+        els.bar.classList.toggle('ok', clean);
         els.bar.style.width = '100%';
+        els.status.textContent = T().finished(ev.ok, ev.failed);
+        setTitle(T().titleDone(ev.ok));
+        // Hand the tab title back after the user has had a chance to see it.
+        setTimeout(() => setTitle(null), 20000);
+        checkHidden();
       }
     }
 
@@ -868,6 +956,9 @@
         return;
       }
       disarm();
+      els.panel.classList.remove('finished', 'finished-warn');
+      els.bar.classList.remove('ok');
+      setLive('', T().unfollowing, '');
       setBusy(true);
       try {
         await unfollow({ confirm: true, keys, onProgress });
@@ -875,6 +966,7 @@
         setBusy(false);
         selected = new Set();
         syncFoot();
+        checkHidden();
       }
     }
 
@@ -910,6 +1002,11 @@
       });
       els.rescan = h('button', { class: 'chip', text: T().rescan, onclick: () => runScan() });
       els.list = h('div', { class: 'list' });
+      els.dot = h('span', { class: 'dot' });
+      els.liveWhat = h('span', { class: 'what' });
+      els.liveWho = h('span', { class: 'who' });
+      els.live = h('div', { class: 'live' }, [els.dot, els.liveWhat, els.liveWho]);
+      els.hiddenWarn = h('div', { class: 'hidden-warn', text: T().hiddenWarn });
       els.status = h('div', { class: 'status' });
       els.bar = h('i');
       els.go = h('button', { class: 'primary', onclick: () => go() });
@@ -919,6 +1016,7 @@
         onclick: () => {
           stop();
           els.status.textContent = T().stopped;
+          setLive('warn', T().stopped, '');
         },
       });
       els.export = h('button', {
@@ -942,6 +1040,8 @@
         h('div', { class: 'body' }, [
           h('div', { class: 'tools' }, [els.search, els.all, els.none, els.rescan]),
           els.list,
+          els.live,
+          els.hiddenWarn,
           els.status,
           h('div', { class: 'bar' }, [els.bar]),
           h('div', { class: 'foot' }, [els.go, els.stop, els.export]),
@@ -971,6 +1071,7 @@
       document.body.appendChild(host);
 
       els.stop.disabled = true;
+      document.addEventListener('visibilitychange', checkHidden);
       renderList();
       syncFoot();
       if (!SCANNED) runScan();
@@ -979,6 +1080,8 @@
 
     function close() {
       if (host) {
+        document.removeEventListener('visibilitychange', checkHidden);
+        setTitle(null);
         host.remove();
         host = null;
         root = null;

@@ -11,9 +11,9 @@ never notices, and resumably enough that you can close the tab whenever.
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![No build step](https://img.shields.io/badge/build%20step-none-brightgreen.svg)](#install)
 [![Rust CLI](https://img.shields.io/badge/also-a%20Rust%20CLI-orange.svg)](#the-rust-cli)
-[![Stars](https://img.shields.io/github/stars/enesyaks/linkedin-unfollower?style=social)](https://github.com/enesyaks/linkedin-unfollower/stargazers)
+[![Stars](https://img.shields.io/github/stars/enesyaks/Linkedin-Unfollower?style=social)](https://github.com/enesyaks/Linkedin-Unfollower/stargazers)
 
-### [→ Get the code (one button)](https://enesyaks.github.io/linkedin-unfollower/)
+### [→ Get the code (one button)](https://enesyaks.github.io/Linkedin-Unfollower/)
 
 <img src="docs/img/panel.png" alt="The panel open over LinkedIn's companies page, listing followed companies with checkboxes, a filter box, and an Unfollow button" width="420">
 
@@ -38,7 +38,7 @@ No clone, no npm, no build step. Three ways, best first.
 
 ### 1. The copy button — nothing to install
 
-Go to **[enesyaks.github.io/linkedin-unfollower](https://enesyaks.github.io/linkedin-unfollower/)**,
+Go to **[enesyaks.github.io/Linkedin-Unfollower](https://enesyaks.github.io/Linkedin-Unfollower/)**,
 press **Copy the code**, then open
 [your companies page](https://www.linkedin.com/mynetwork/network-manager/company/),
 press `⌘⌥J` / `F12`, paste, Enter. If Chrome refuses to paste, type

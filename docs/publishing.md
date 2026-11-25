@@ -9,7 +9,7 @@ indexed, and it is what shows in every list. Lead with the problem, not the
 stack.
 
 ```bash
-gh repo create enesyaks/linkedin-unfollower --public --source=. --remote=origin --push --description "Bulk-unfollow LinkedIn companies from a panel in your browser. No build step, no API keys, rate-limit aware. Plus a Rust CLI."
+gh repo create enesyaks/Linkedin-Unfollower --public --source=. --remote=origin --push --description "Bulk-unfollow LinkedIn companies from a panel in your browser. No build step, no API keys, rate-limit aware. Plus a Rust CLI."
 ```
 
 ## 2. Topics
@@ -18,13 +18,13 @@ Topics drive GitHub's own discovery pages and its search facets. Use all of
 them; there is no penalty for breadth, only for irrelevance.
 
 ```bash
-gh repo edit enesyaks/linkedin-unfollower --add-topic linkedin --add-topic linkedin-automation --add-topic unfollow --add-topic userscript --add-topic tampermonkey --add-topic browser-automation --add-topic devtools --add-topic bulk-actions --add-topic productivity --add-topic job-search --add-topic rate-limiting --add-topic javascript --add-topic rust --add-topic cli --add-topic no-dependencies
+gh repo edit enesyaks/Linkedin-Unfollower --add-topic linkedin --add-topic linkedin-automation --add-topic unfollow --add-topic userscript --add-topic tampermonkey --add-topic browser-automation --add-topic devtools --add-topic bulk-actions --add-topic productivity --add-topic job-search --add-topic rate-limiting --add-topic javascript --add-topic rust --add-topic cli --add-topic no-dependencies
 ```
 
 ## 3. Repo settings
 
 ```bash
-gh repo edit enesyaks/linkedin-unfollower --enable-issues --enable-discussions --delete-branch-on-merge
+gh repo edit enesyaks/Linkedin-Unfollower --enable-issues --enable-discussions --delete-branch-on-merge
 ```
 
 Then, in **Settings → General → Social preview**, upload
@@ -40,14 +40,14 @@ clone anything, and the page reads the file from the repo itself, so it can
 never drift out of date.
 
 ```bash
-gh api repos/enesyaks/linkedin-unfollower/pages -X POST -f "source[branch]=main" -f "source[path]=/"
+gh api repos/enesyaks/Linkedin-Unfollower/pages -X POST -f "source[branch]=main" -f "source[path]=/"
 ```
 
-It goes live at <https://enesyaks.github.io/linkedin-unfollower/> within a
+It goes live at <https://enesyaks.github.io/Linkedin-Unfollower/> within a
 minute or two. Then put that URL in the repo's **About** box:
 
 ```bash
-gh repo edit enesyaks/linkedin-unfollower --homepage "https://enesyaks.github.io/linkedin-unfollower/"
+gh repo edit enesyaks/Linkedin-Unfollower --homepage "https://enesyaks.github.io/Linkedin-Unfollower/"
 ```
 
 Check the social card with <https://www.opengraph.xyz/> once Pages is live —
@@ -73,7 +73,7 @@ gh release create v0.1.0 --title "v0.1.0 — browser panel + Rust CLI" --notes "
 Ranked by how much they actually move the needle for a tool like this.
 
 0. **Your own landing page first.** Every post below should link to
-   <https://enesyaks.github.io/linkedin-unfollower/>, not to the repo. One
+   <https://enesyaks.github.io/Linkedin-Unfollower/>, not to the repo. One
    button beats a file tree for anyone who is not already a developer, and
    the page links back to GitHub for the ones who are.
 1. **[GreasyFork](https://greasyfork.org/)** — the userscript directory. This

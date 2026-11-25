@@ -12,9 +12,9 @@ kaldığı yerden devam edebilir.
 [![Lisans: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Derleme yok](https://img.shields.io/badge/build%20step-none-brightgreen.svg)](#kurulum)
 [![Rust CLI](https://img.shields.io/badge/ayr%C4%B1ca-Rust%20CLI-orange.svg)](#rust-cli)
-[![Yıldız](https://img.shields.io/github/stars/enesyaks/linkedin-unfollower?style=social)](https://github.com/enesyaks/linkedin-unfollower/stargazers)
+[![Yıldız](https://img.shields.io/github/stars/enesyaks/Linkedin-Unfollower?style=social)](https://github.com/enesyaks/Linkedin-Unfollower/stargazers)
 
-### [→ Kodu al (tek düğme)](https://enesyaks.github.io/linkedin-unfollower/)
+### [→ Kodu al (tek düğme)](https://enesyaks.github.io/Linkedin-Unfollower/)
 
 <img src="docs/img/panel.png" alt="LinkedIn şirketler sayfasının üzerinde açılan panel: onay kutulu şirket listesi, filtre kutusu ve Unfollow düğmesi" width="420">
 
@@ -39,7 +39,7 @@ Klonlamak yok, npm yok, derleme yok. Üç yol, en iyisi başta.
 
 ### 1. Kopyala düğmesi — hiçbir şey kurmadan
 
-**[enesyaks.github.io/linkedin-unfollower](https://enesyaks.github.io/linkedin-unfollower/)**
+**[enesyaks.github.io/Linkedin-Unfollower](https://enesyaks.github.io/Linkedin-Unfollower/)**
 adresine git, **Kodu kopyala**'ya bas, sonra
 [şirketler sayfanı](https://www.linkedin.com/mynetwork/network-manager/company/)
 aç, `⌘⌥J` / `F12`, yapıştır, Enter. Chrome yapıştırmayı engellerse bir kez
