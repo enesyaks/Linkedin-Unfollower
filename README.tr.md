@@ -14,6 +14,8 @@ kaldığı yerden devam edebilir.
 [![Rust CLI](https://img.shields.io/badge/ayr%C4%B1ca-Rust%20CLI-orange.svg)](#rust-cli)
 [![Yıldız](https://img.shields.io/github/stars/enesyaks/linkedin-unfollower?style=social)](https://github.com/enesyaks/linkedin-unfollower/stargazers)
 
+### [→ Kodu al (tek düğme)](https://enesyaks.github.io/linkedin-unfollower/)
+
 <img src="docs/img/panel.png" alt="LinkedIn şirketler sayfasının üzerinde açılan panel: onay kutulu şirket listesi, filtre kutusu ve Unfollow düğmesi" width="420">
 
 </div>
@@ -33,29 +35,31 @@ bozmadan değiştiremez.
 
 ## Kurulum
 
-Üç yol, en iyisi başta. Derleme adımı yok, npm yok.
+Klonlamak yok, npm yok, derleme yok. Üç yol, en iyisi başta.
 
-### 1. Userscript — bir kez kur, hep dursun
+### 1. Kopyala düğmesi — hiçbir şey kurmadan
+
+**[enesyaks.github.io/linkedin-unfollower](https://enesyaks.github.io/linkedin-unfollower/)**
+adresine git, **Kodu kopyala**'ya bas, sonra
+[şirketler sayfanı](https://www.linkedin.com/mynetwork/network-manager/company/)
+aç, `⌘⌥J` / `F12`, yapıştır, Enter. Chrome yapıştırmayı engellerse bir kez
+`allow pasting` yaz.
+
+O sayfa kopyalamadan önce dosyanın tamamını da gösteriyor — giriş yapmış bir
+hesabın yanında çalıştıracağın her şey için doğru alışkanlık bu.
+
+### 2. Userscript — bir kez kur, hep dursun
 
 [Tampermonkey](https://www.tampermonkey.net/) veya
 [Violentmonkey](https://violentmonkey.github.io/) kur, sonra
 [`web/unfollow.js`](web/unfollow.js) dosyasını ham (raw) halde aç ve kur'a bas.
 Panel, şirketler sayfana her girdiğinde kendiliğinden açılır.
 
-### 2. DevTools Snippet — bir kez yapıştır, hep çalıştır
+### 3. DevTools Snippet — bir kez yapıştır, hep çalıştır
 
 Chrome'da: DevTools → **Sources** → **Snippets** → yeni snippet →
 [`web/unfollow.js`](web/unfollow.js) içeriğini yapıştır → kaydet. Sonra her
 seferinde `⌘⏎` / `Ctrl+Enter` ile çalıştır.
-
-### 3. Konsola yapıştır — sıfır kurulum
-
-```bash
-curl -s https://raw.githubusercontent.com/enesyaks/linkedin-unfollower/main/web/unfollow.js | pbcopy
-```
-
-[Şirketler sayfanı](https://www.linkedin.com/mynetwork/network-manager/company/)
-aç, `⌘⌥J` / `F12`, Chrome sorarsa `allow pasting` yaz, yapıştır, Enter.
 
 > **Neden tek satırlık bir bookmarklet yok.** LinkedIn
 > `script-src 'strict-dynamic' 'nonce-…'` gönderiyor; bu dosyayı GitHub'dan

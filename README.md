@@ -13,6 +13,8 @@ never notices, and resumably enough that you can close the tab whenever.
 [![Rust CLI](https://img.shields.io/badge/also-a%20Rust%20CLI-orange.svg)](#the-rust-cli)
 [![Stars](https://img.shields.io/github/stars/enesyaks/linkedin-unfollower?style=social)](https://github.com/enesyaks/linkedin-unfollower/stargazers)
 
+### [→ Get the code (one button)](https://enesyaks.github.io/linkedin-unfollower/)
+
 <img src="docs/img/panel.png" alt="The panel open over LinkedIn's companies page, listing followed companies with checkboxes, a filter box, and an Unfollow button" width="420">
 
 </div>
@@ -32,28 +34,30 @@ readers.
 
 ## Install
 
-Three ways, best first. There is no build step and no npm install.
+No clone, no npm, no build step. Three ways, best first.
 
-### 1. Userscript — install once, always there
+### 1. The copy button — nothing to install
+
+Go to **[enesyaks.github.io/linkedin-unfollower](https://enesyaks.github.io/linkedin-unfollower/)**,
+press **Copy the code**, then open
+[your companies page](https://www.linkedin.com/mynetwork/network-manager/company/),
+press `⌘⌥J` / `F12`, paste, Enter. If Chrome refuses to paste, type
+`allow pasting` once first.
+
+That page also shows the whole file before you copy it, which is the right
+habit for anything you run next to a logged-in account.
+
+### 2. Userscript — install once, always there
 
 Install [Tampermonkey](https://www.tampermonkey.net/) or
 [Violentmonkey](https://violentmonkey.github.io/), then open
 [`web/unfollow.js`](web/unfollow.js) raw and click install. The panel then
 opens by itself whenever you visit your companies page.
 
-### 2. DevTools Snippet — paste once, run forever
+### 3. DevTools Snippet — paste once, run forever
 
 In Chrome: DevTools → **Sources** → **Snippets** → New snippet → paste
 [`web/unfollow.js`](web/unfollow.js) → save. Run it any time with `⌘⏎` / `Ctrl+Enter`.
-
-### 3. Console paste — zero setup
-
-```bash
-curl -s https://raw.githubusercontent.com/enesyaks/linkedin-unfollower/main/web/unfollow.js | pbcopy
-```
-
-Open [your companies page](https://www.linkedin.com/mynetwork/network-manager/company/),
-press `⌘⌥J` / `F12`, type `allow pasting` if Chrome asks, paste, Enter.
 
 > **Why there is no one-line bookmarklet.** LinkedIn serves
 > `script-src 'strict-dynamic' 'nonce-…'`, so a snippet that fetches this file

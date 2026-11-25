@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>linkedin-unfollower — unfollow LinkedIn companies in bulk</title>
+<meta name="description" content="Copy one file, paste it into your browser console, and a panel opens that unfollows LinkedIn companies in bulk — slowly, resumably, no extension required.">
+<meta property="og:title" content="linkedin-unfollower">
+<meta property="og:description" content="Unfollow hundreds of LinkedIn companies without clicking hundreds of times. Copy, paste, done.">
+<meta property="og:image" content="https://enesyaks.github.io/linkedin-unfollower/docs/img/panel.png">
+<meta property="og:url" content="https://enesyaks.github.io/linkedin-unfollower/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧹</text></svg>">
+<style>
+  :root {
+    --bg: #f7f6f3; --card: #fff; --fg: #1b1f23; --muted: #5b6673;
+    --line: #e2e4e8; --accent: #0a66c2; --accent-dark: #004182; --ok: #15692c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #14181b; --card: #1d2226; --fg: #e9e9ea; --muted: #a3abb4;
+            --line: #2f3a42; --accent: #4f9ae8; --accent-dark: #7bb6ef; --ok: #5bc47d; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 48px 20px 80px; }
+  header { text-align: center; }
+  h1 { font-size: 40px; line-height: 1.1; margin: 0 0 12px; letter-spacing: -.02em; }
+  .tag { font-size: 19px; color: var(--muted); margin: 0 auto 28px; max-width: 580px; }
+  .shot { width: 100%; max-width: 380px; border-radius: 12px; display: block;
+    margin: 0 auto 36px; box-shadow: 0 10px 34px rgba(0,0,0,.16); }
+  .langs { position: absolute; top: 16px; right: 20px; display: flex; gap: 4px; }
+  .lang { border: 1px solid var(--line); background: var(--card); color: var(--muted);
+    border-radius: 7px; padding: 4px 10px; font-size: 13px; cursor: pointer; }
+  .lang[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .steps { counter-reset: s; list-style: none; padding: 0; margin: 0 0 8px; }
+  .steps li { counter-increment: s; position: relative; padding: 0 0 20px 46px; }
+  .steps li::before { content: counter(s); position: absolute; left: 0; top: 0;
+    width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: #fff;
+    display: grid; place-items: center; font-weight: 700; font-size: 15px; }
+  .steps b { font-weight: 600; }
+  .copy { display: block; width: 100%; border: 0; border-radius: 12px; cursor: pointer;
+    background: var(--accent); color: #fff; font-size: 18px; font-weight: 700;
+    padding: 18px 20px; margin: 4px 0 10px; transition: background .15s, transform .08s; }
+  .copy:hover { background: var(--accent-dark); }
+  .copy:active { transform: translateY(1px); }
+  .copy.done { background: var(--ok); }
+  .copy.err { background: #b32d2d; }
+  .sub { text-align: center; color: var(--muted); font-size: 13px; margin: 0 0 36px; }
+  .sub a { color: inherit; }
+  code, kbd, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  kbd { background: var(--card); border: 1px solid var(--line); border-bottom-width: 2px;
+    border-radius: 5px; padding: 1px 6px; font-size: 13px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 22px 24px; margin: 0 0 20px; }
+  h2 { font-size: 21px; margin: 36px 0 14px; letter-spacing: -.01em; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 22px; margin: 0; }
+  .grid dt { font-weight: 600; font-size: 14px; }
+  .grid dd { margin: 0 0 8px; color: var(--muted); font-size: 14px; }
+  details { border: 1px solid var(--line); border-radius: 12px; background: var(--card);
+    padding: 14px 18px; margin: 0 0 14px; }
+  details summary { cursor: pointer; font-weight: 600; }
+  details pre { max-height: 420px; overflow: auto; background: var(--bg); padding: 14px;
+    border-radius: 8px; font-size: 12px; line-height: 1.5; border: 1px solid var(--line); }
+  .note { font-size: 14px; color: var(--muted); }
+  footer { text-align: center; color: var(--muted); font-size: 14px; margin-top: 48px; }
+  footer a, .card a { color: var(--accent); }
+  @media (max-width: 560px) { h1 { font-size: 30px; } .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="langs">
+  <button class="lang" data-lang="en" aria-pressed="true">EN</button>
+  <button class="lang" data-lang="tr" aria-pressed="false">TR</button>
+</div>
+
+<div class="wrap">
+  <header>
+    <h1 data-i="title">Unfollow LinkedIn companies in bulk</h1>
+    <p class="tag" data-i="tagline">Copy one file. Paste it into your browser console. A panel opens,
+      lists every company you follow, and unfollows the ones you tick — slowly enough
+      that LinkedIn never notices.</p>
+    <img class="shot" src="docs/img/panel.png" alt="The panel listing followed companies with checkboxes and an Unfollow button">
+  </header>
+
+  <ol class="steps">
+    <li data-i="s1">Open <a href="https://www.linkedin.com/mynetwork/network-manager/company/" target="_blank" rel="noopener">your followed companies page</a> on LinkedIn.</li>
+    <li data-i="s2">Press <kbd>⌘</kbd><kbd>⌥</kbd><kbd>J</kbd> (Mac) or <kbd>F12</kbd> (Windows) to open the console. If Chrome refuses to paste, type <code>allow pasting</code> and press Enter once.</li>
+    <li data-i="s3">Press the button below, paste into the console with <kbd>⌘</kbd><kbd>V</kbd>, and press Enter.</li>
+  </ol>
+
+  <button class="copy" id="copy" data-i="copy">Copy the code</button>
+  <p class="sub" id="sub" data-i="sub">Loading the file…</p>
+
+  <h2 data-i="h-what">What happens then</h2>
+  <div class="card">
+    <dl class="grid">
+      <dt data-i="k1">The panel opens by itself</dt>
+      <dd data-i="v1">and scans your full list — about 20 seconds for 135 companies.</dd>
+      <dt data-i="k2">Nothing is clicked</dt>
+      <dd data-i="v2">until you tick companies and press Unfollow twice. The second press is the confirm.</dd>
+      <dt data-i="k3">It goes slowly on purpose</dt>
+      <dd data-i="v3">1.8–4.2 s between clicks, a long pause every 15, and it stops by itself if LinkedIn pushes back.</dd>
+      <dt data-i="k4">You can stop any time</dt>
+      <dd data-i="v4">progress is saved after every company, so running it again picks up where you left off.</dd>
+    </dl>
+  </div>
+
+  <h2 data-i="h-again">Tired of pasting it every time?</h2>
+  <div class="card">
+    <p class="note" data-i="again1">Install <a href="https://www.tampermonkey.net/" target="_blank" rel="noopener">Tampermonkey</a>
+      or <a href="https://violentmonkey.github.io/" target="_blank" rel="noopener">Violentmonkey</a>, then
+      <a id="userjs" href="web/unfollow.js">open the file</a> — it is already a valid userscript, so your
+      manager offers to install it. After that the panel opens by itself every time you visit the page.</p>
+    <p class="note" data-i="again2">Or save it once as a Chrome DevTools snippet: <b>Sources → Snippets → New snippet</b>,
+      paste, save, and run it later with <kbd>⌘</kbd><kbd>⏎</kbd>.</p>
+  </div>
+
+  <h2 data-i="h-trust">Before you paste code into your own session</h2>
+  <div class="card">
+    <p class="note" data-i="trust1">You should not run code you have not read, especially not next to a logged-in
+      account. That is why this is plain, commented JavaScript rather than a minified blob — read it below, or on
+      <a href="https://github.com/enesyaks/linkedin-unfollower" target="_blank" rel="noopener">GitHub</a>.</p>
+    <p class="note" data-i="trust2">It talks to nothing but LinkedIn: no server, no analytics, no account, no network
+      request of its own. It clicks the same buttons you would, and remembers what it finished in your browser's
+      own storage.</p>
+  </div>
+
+  <details>
+    <summary data-i="read">Read the whole file first</summary>
+    <pre id="src">Loading…</pre>
+  </details>
+
+  <footer>
+    <p><a href="https://github.com/enesyaks/linkedin-unfollower" target="_blank" rel="noopener">Source on GitHub</a>
+      · MIT · <span data-i="foot">built because unfollowing 135 companies by hand is not a good afternoon</span></p>
+  </footer>
+</div>
+
+<script>
+const TR = {
+  title: 'LinkedIn şirketlerini toplu takipten çıkar',
+  tagline: 'Tek dosyayı kopyala. Tarayıcı konsoluna yapıştır. Bir panel açılır, takip ettiğin tüm şirketleri listeler ve işaretlediklerini takipten çıkarır — LinkedIn’in fark etmeyeceği kadar yavaş.',
+  s1: 'LinkedIn’de <a href="https://www.linkedin.com/mynetwork/network-manager/company/" target="_blank" rel="noopener">takip ettiğin şirketler sayfasını</a> aç.',
+  s2: 'Konsolu aç: <kbd>⌘</kbd><kbd>⌥</kbd><kbd>J</kbd> (Mac) veya <kbd>F12</kbd> (Windows). Chrome yapıştırmayı engellerse bir kez <code>allow pasting</code> yazıp Enter’a bas.',
+  s3: 'Aşağıdaki düğmeye bas, konsola <kbd>⌘</kbd><kbd>V</kbd> ile yapıştır, Enter.',
+  copy: 'Kodu kopyala',
+  'h-what': 'Sonra ne oluyor',
+  k1: 'Panel kendiliğinden açılır', v1: 've tüm listeni tarar — 135 şirket için yaklaşık 20 saniye.',
+  k2: 'Hiçbir şeye tıklanmaz', v2: 'sen şirketleri işaretleyip Unfollow’a iki kez basana kadar. İkinci basış onaydır.',
+  k3: 'Bilerek yavaş', v3: 'tıklamalar arası 1.8–4.2 sn, her 15’te uzun mola, LinkedIn direnirse kendiliğinden durur.',
+  k4: 'İstediğin an durdurabilirsin', v4: 'ilerleme her şirketten sonra kaydedilir, tekrar çalıştırınca kaldığı yerden devam eder.',
+  'h-again': 'Her seferinde yapıştırmak istemiyor musun?',
+  again1: '<a href="https://www.tampermonkey.net/" target="_blank" rel="noopener">Tampermonkey</a> ya da <a href="https://violentmonkey.github.io/" target="_blank" rel="noopener">Violentmonkey</a> kur, sonra <a href="web/unfollow.js">dosyayı aç</a> — zaten geçerli bir userscript, yöneticin kurmayı önerir. Ondan sonra panel sayfaya her girdiğinde kendiliğinden açılır.',
+  again2: 'Ya da Chrome DevTools snippet olarak bir kez kaydet: <b>Sources → Snippets → New snippet</b>, yapıştır, kaydet, sonra <kbd>⌘</kbd><kbd>⏎</kbd> ile çalıştır.',
+  'h-trust': 'Kendi oturumuna kod yapıştırmadan önce',
+  trust1: 'Okumadığın kodu, hele giriş yapmış bir hesabın yanında, çalıştırmamalısın. Bu yüzden burada sıkıştırılmış bir blob değil, yorum satırlı düz JavaScript var — aşağıdan ya da <a href="https://github.com/enesyaks/linkedin-unfollower" target="_blank" rel="noopener">GitHub’dan</a> oku.',
+  trust2: 'LinkedIn dışında hiçbir yere bağlanmaz: sunucu yok, analitik yok, hesap yok, kendine ait tek bir ağ isteği yok. Senin basacağın butonlara basar ve neyi bitirdiğini tarayıcının kendi deposunda tutar.',
+  read: 'Önce dosyanın tamamını oku',
+  sub: '',
+  foot: '135 şirketi elle takipten çıkarmak iyi bir öğlen sonu olmadığı için yazıldı',
+};
+const EN = {};
+document.querySelectorAll('[data-i]').forEach((el) => { EN[el.dataset.i] = el.innerHTML; });
+
+let SOURCE = '';
+const btn = document.getElementById('copy');
+const sub = document.getElementById('sub');
+let lang = (navigator.language || '').toLowerCase().startsWith('tr') ? 'tr' : 'en';
+
+function kb(n) { return (n / 1024).toFixed(1) + ' KB'; }
+
+const SUB = {
+  en: () => SOURCE
+    ? `${kb(SOURCE.length)} of readable JavaScript · no build step · <a href="https://github.com/enesyaks/linkedin-unfollower/blob/main/web/unfollow.js" target="_blank" rel="noopener">view on GitHub</a>`
+    : 'Loading the file…',
+  tr: () => SOURCE
+    ? `${kb(SOURCE.length)} okunabilir JavaScript · derleme yok · <a href="https://github.com/enesyaks/linkedin-unfollower/blob/main/web/unfollow.js" target="_blank" rel="noopener">GitHub’da gör</a>`
+    : 'Dosya yükleniyor…',
+};
+
+function apply() {
+  const dict = lang === 'tr' ? TR : EN;
+  document.querySelectorAll('[data-i]').forEach((el) => {
+    const v = dict[el.dataset.i];
+    if (v != null && el.id !== 'sub') el.innerHTML = v;
+  });
+  sub.innerHTML = SUB[lang]();
+  document.documentElement.lang = lang;
+  document.querySelectorAll('.lang').forEach((b) =>
+    b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+  if (btn.classList.contains('done')) btn.textContent = lang === 'tr' ? 'Kopyalandı' : 'Copied';
+}
+
+document.querySelectorAll('.lang').forEach((b) =>
+  b.addEventListener('click', () => { lang = b.dataset.lang; apply(); }));
+
+fetch('web/unfollow.js')
+  .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+  .then((text) => {
+    SOURCE = text;
+    document.getElementById('src').textContent = text;
+    sub.innerHTML = SUB[lang]();
+  })
+  .catch(() => {
+    sub.textContent = lang === 'tr'
+      ? 'Dosya yüklenemedi — GitHub’dan kopyala.'
+      : 'Could not load the file — copy it from GitHub instead.';
+    btn.classList.add('err');
+  });
+
+btn.addEventListener('click', async () => {
+  if (!SOURCE) return;
+  try {
+    await navigator.clipboard.writeText(SOURCE);
+    btn.classList.remove('err');
+    btn.classList.add('done');
+    btn.textContent = lang === 'tr' ? 'Kopyalandı' : 'Copied';
+    setTimeout(() => {
+      btn.classList.remove('done');
+      btn.textContent = (lang === 'tr' ? TR : EN).copy;
+    }, 2500);
+  } catch (e) {
+    // Clipboard API needs https and a user gesture; fall back to selecting it.
+    btn.classList.add('err');
+    btn.textContent = lang === 'tr' ? 'Kopyalanamadı — aşağıdan seç' : 'Copy failed — select it below';
+    const d = document.querySelector('details');
+    d.open = true;
+    const r = document.createRange();
+    r.selectNodeContents(document.getElementById('src'));
+    const sel = getSelection();
+    sel.removeAllRanges();
+    sel.addRange(r);
+  }
+});
+
+apply();
+</script>
+</body>
+</html>

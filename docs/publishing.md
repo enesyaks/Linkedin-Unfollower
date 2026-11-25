@@ -32,7 +32,29 @@ Then, in **Settings → General → Social preview**, upload
 Discord renders that image. A repo with a screenshot preview gets clicked;
 one with the default grey card does not.
 
-## 4. A release, so the raw URL is stable
+## 4. Turn on GitHub Pages — this is how people get the code
+
+`index.html` at the repo root is the landing page: a screenshot, three steps,
+and a button that copies `web/unfollow.js` to the clipboard. Nobody has to
+clone anything, and the page reads the file from the repo itself, so it can
+never drift out of date.
+
+```bash
+gh api repos/enesyaks/linkedin-unfollower/pages -X POST -f "source[branch]=main" -f "source[path]=/"
+```
+
+It goes live at <https://enesyaks.github.io/linkedin-unfollower/> within a
+minute or two. Then put that URL in the repo's **About** box:
+
+```bash
+gh repo edit enesyaks/linkedin-unfollower --homepage "https://enesyaks.github.io/linkedin-unfollower/"
+```
+
+Check the social card with <https://www.opengraph.xyz/> once Pages is live —
+`og:image` points at an absolute URL, so a link to the page renders the
+screenshot on LinkedIn, X and Slack.
+
+## 5. A release, so the raw URL is stable
 
 ```bash
 git tag -a v0.1.0 -m "First release: browser panel + Rust CLI"
@@ -46,10 +68,14 @@ git push origin v0.1.0
 gh release create v0.1.0 --title "v0.1.0 — browser panel + Rust CLI" --notes "Paste one file, get a panel, unfollow in bulk at a polite pace. Rust CLI for unattended runs."
 ```
 
-## 5. Where to post it
+## 6. Where to post it
 
 Ranked by how much they actually move the needle for a tool like this.
 
+0. **Your own landing page first.** Every post below should link to
+   <https://enesyaks.github.io/linkedin-unfollower/>, not to the repo. One
+   button beats a file tree for anyone who is not already a developer, and
+   the page links back to GitHub for the ones who are.
 1. **[GreasyFork](https://greasyfork.org/)** — the userscript directory. This
    is the highest-intent audience that exists for this project: people already
    running Tampermonkey, searching for exactly this. `web/unfollow.js` is
@@ -70,7 +96,7 @@ Ranked by how much they actually move the needle for a tool like this.
    than the tool: the aria-label was `Click to stop following <Company>`, not
    `Following`, so the first version silently found zero companies.
 
-## 6. What actually keeps the stars
+## 7. What actually keeps the stars
 
 - A screenshot above the fold. Already done.
 - An answer to "will this get my account banned?" in plain words. Already in
