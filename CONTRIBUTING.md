@@ -32,6 +32,14 @@ make lint
 ## If LinkedIn's UI changes
 
 The console tool finds buttons by accessible label, normalising Turkish
-characters first (`web/unfollow.js`, `norm()` and `FOLLOWING_RE`). Adding a
-language means adding its words to those regexes and a case to the fake-DOM
-fixture — not a new CSS selector.
+characters first (`web/unfollow.js`: `norm()`, `FOLLOWING_RE`, `followState()`).
+Adding a language means adding its words to those regexes and a locale to
+`LOCALES` in `web/test/fake-dom.mjs` — not a new CSS selector.
+
+Note what the live page actually serves, because it is not what you would
+guess: the button's visible text is `Following`, but its `aria-label` is
+`Click to stop following <Company>`, and the aria-label is read first. The
+patterns are unanchored for that reason, and `followState()` tests the
+following-patterns before the follow-patterns because "stop following"
+contains both. The fixtures in `fake-dom.mjs` carry the real label shapes;
+keep them that way.

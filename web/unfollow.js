@@ -64,15 +64,59 @@
       .trim();
   }
 
-  // "Following" / "Takip ediliyor" -> the button that will unfollow on click.
-  const FOLLOWING_RE = /^(following|takip ediliyor|unfollow|takibi birak|takipten cik)\b/;
-  // "Follow" / "Takip et" -> already unfollowed.
-  const FOLLOW_RE = /^(follow|takip et)\b/;
-  const CONFIRM_RE = /^(unfollow|takibi birak|takipten cik)\b/;
+  // The button that will unfollow on click. LinkedIn's visible text is
+  // "Following", but its aria-label is "Click to stop following <Company>" --
+  // and the aria-label is what assistive tech, and this tool, reads first. So
+  // these patterns are deliberately unanchored.
+  const FOLLOWING_RE =
+    /\b(stop following|unfollow|following|takip ediliyor|takibi birak|takip etmeyi birak|takipten cik)\b/;
+  // "Follow" / "Takip et" -> already unfollowed. \b stops this matching
+  // "following" or "takip ediliyor", so order of testing still matters.
+  const FOLLOW_RE = /\b(follow|takip et)\b/;
+  const CONFIRM_RE = /\b(unfollow|stop following|takibi birak|takipten cik)\b/;
+  // Noise LinkedIn wraps the company name in. Applied to the RAW label so the
+  // company's own capitalisation survives. The English shapes are verified
+  // against the live page; the Turkish ones are best-effort.
+  const LABEL_NOISE_PATTERNS = [
+    /^click to (stop following|unfollow|follow)\s*/i,
+    /^(stop following|unfollow|following)\s*/i,
+    /^(takip ediliyor|takibi b[\u0131i]rak|takipten \u00e7[\u0131i]k)\s*/i,
+    /\s*adl[\u0131i]\s+(\u015firketi|sirketi|sayfay[\u0131i]).*$/i,
+    /\s*takip etmeyi b[\u0131i]rakmak i\u00e7in t[\u0131i]klay[\u0131i]n\s*$/i,
+  ];
+
+  /** Best-effort company name from a button's aria-label alone. */
+  function nameFromLabel(btn) {
+    let raw = (btn.getAttribute('aria-label') || '').trim();
+    for (const re of LABEL_NOISE_PATTERNS) raw = raw.replace(re, '');
+    return raw.trim();
+  }
 
   function label(el) {
     if (!el) return '';
     return norm(el.getAttribute('aria-label') || el.innerText || el.textContent);
+  }
+
+  /** Every label a button exposes, aria-label first. */
+  function labelsOf(el) {
+    if (!el) return [];
+    return [el.getAttribute('aria-label'), el.innerText || el.textContent]
+      .map(norm)
+      .filter(Boolean);
+  }
+
+  /**
+   * 'following' (clicking unfollows), 'follow' (already unfollowed), or null.
+   * Checked per label, following-patterns first, because "stop following"
+   * contains both.
+   */
+  function followState(el) {
+    if (!el) return null;
+    for (const l of labelsOf(el)) {
+      if (FOLLOWING_RE.test(l)) return 'following';
+      if (FOLLOW_RE.test(l)) return 'follow';
+    }
+    return null;
   }
 
   function logGroup(title, fn) {
@@ -140,10 +184,20 @@
     return { urn: null, id: null };
   }
 
+  /**
+   * The company link belonging to THIS button. Walks up, but stops the moment
+   * an ancestor holds more than one follow toggle -- past that point we have
+   * left the card and would happily return the neighbouring company's link.
+   */
   function findCompanyLink(startEl) {
     let el = startEl;
     for (let depth = 0; el && depth < 10; depth++, el = el.parentElement) {
-      const a = el.querySelector && el.querySelector('a[href*="/company/"], a[href*="/school/"]');
+      if (!el.querySelectorAll) continue;
+      const toggles = [...el.querySelectorAll('button')].filter(
+        (b) => followState(b) === 'following',
+      );
+      if (toggles.length > 1) return null;
+      const a = el.querySelector('a[href*="/company/"], a[href*="/school/"]');
       if (a) return a;
     }
     return null;
@@ -163,8 +217,7 @@
     const out = [];
     const seen = new Set();
     for (const btn of document.querySelectorAll('button')) {
-      const l = label(btn);
-      if (!FOLLOWING_RE.test(l)) continue;
+      if (followState(btn) !== 'following') continue;
       if (btn.disabled) continue;
 
       const link = findCompanyLink(btn);
@@ -174,10 +227,8 @@
 
       // Prefer a clean name: the link text, minus LinkedIn's screen-reader noise.
       let name = link ? (link.innerText || link.textContent || '').split('\n')[0].trim() : '';
-      if (!name) {
-        const aria = btn.getAttribute('aria-label') || '';
-        name = aria.replace(/^(takibi birak|unfollow|following|takip ediliyor)\s*/i, '').trim();
-      }
+      // "Click to stop following Acme Corp" -> "Acme Corp"
+      if (!name) name = nameFromLabel(btn);
       if (!name) name = slug || urn || '(unknown)';
 
       const key = urn || slug || name;
@@ -351,7 +402,7 @@
   async function unfollowOne(entry) {
     const btn = entry.button;
     if (!btn || !document.contains(btn)) return { ok: false, reason: 'button detached' };
-    if (FOLLOW_RE.test(label(btn))) return { ok: true, reason: 'already unfollowed' };
+    if (followState(btn) === 'follow') return { ok: true, reason: 'already unfollowed' };
 
     btn.scrollIntoView({ block: 'center', behavior: 'instant' });
     await sleep(rand(200, 500));
@@ -361,8 +412,7 @@
     const deadline = Date.now() + CONFIG.verifyTimeout;
     while (Date.now() < deadline) {
       if (!document.contains(btn)) return { ok: true, reason: 'card removed' };
-      const l = label(btn);
-      if (FOLLOW_RE.test(l)) return { ok: true, reason: 'button flipped to follow' };
+      if (followState(btn) === 'follow') return { ok: true, reason: 'button flipped to follow' };
       if (watchdog.tripped()) return { ok: false, reason: `http ${watchdog.lastBad}`, fatal: true };
       await sleep(250);
     }

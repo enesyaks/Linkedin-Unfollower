@@ -94,18 +94,41 @@ export class El {
   click() { if (typeof this.onclick === 'function') this.onclick(this); }
 }
 
+/**
+ * Label shapes LinkedIn actually serves. Verified against the live
+ * /mynetwork/network-manager/company/ page on 2026-11-25: the visible text is
+ * "Following", but the aria-label is "Click to stop following <Company>".
+ * The tool reads aria-label first, so the fixtures must carry the real thing.
+ */
+export const LOCALES = {
+  en: {
+    following: (n) => `Click to stop following ${n}`,
+    follow: (n) => `Click to follow ${n}`,
+    followingText: 'Following',
+    followText: 'Follow',
+  },
+  tr: {
+    following: (n) => `${n} adlı şirketi takip etmeyi bırakmak için tıklayın`,
+    follow: (n) => `${n} adlı şirketi takip etmek için tıklayın`,
+    followingText: 'Takip ediliyor',
+    followText: 'Takip et',
+  },
+};
+
 /** Builds a page with `companies.length` follow cards. */
-export function buildPage(companies) {
+export function buildPage(companies, locale = 'en') {
+  const L = LOCALES[locale] || LOCALES.en;
   const root = new El('body', { class: 'app' });
   const cards = [];
   for (const c of companies) {
     const card = new El('li', c.urn ? { 'data-entity-urn': c.urn } : {});
     const link = new El('a', { href: `https://www.linkedin.com/company/${c.slug}/` }, c.name);
-    const btn = new El('button', { 'aria-label': `Takip ediliyor ${c.name}` });
+    const btn = new El('button', { 'aria-label': L.following(c.name) }, L.followingText);
     btn.onclick = () => {
       if (c.broken) return;                       // simulates a dead button
       if (c.removesCard) { card.remove(); return; }
-      btn.setAttribute('aria-label', `Takip et ${c.name}`);
+      btn.setAttribute('aria-label', L.follow(c.name));
+      btn.text = L.followText;
     };
     card.append(link, btn);
     root.append(card);

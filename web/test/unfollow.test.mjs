@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { buildPage, installGlobals } from './fake-dom.mjs';
+import { buildPage, installGlobals, LOCALES } from './fake-dom.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const SRC = readFileSync(join(here, '..', 'unfollow.js'), 'utf8');
@@ -31,8 +31,8 @@ const quiet = () => {
 };
 
 /** Fresh page + freshly evaluated tool, so scenarios never leak state. */
-function boot(spec = FIXTURE, config = FAST) {
-  const page = buildPage(spec);
+function boot(spec = FIXTURE, config = FAST, locale = 'en') {
+  const page = buildPage(spec, locale);
   const teardown = installGlobals(page.root);
   const restore = quiet();
   try {
@@ -42,7 +42,7 @@ function boot(spec = FIXTURE, config = FAST) {
   } finally {
     restore();
   }
-  return { page, LIU: globalThis.window.LIU, teardown };
+  return { page, LIU: globalThis.window.LIU, teardown, locale };
 }
 
 const tests = [];
@@ -60,6 +60,37 @@ test('scan discovers every followed company with name, slug and urn', async () =
   assert.equal(acme.id, '1001');
   // Missing URN must not drop the entry — the console tool does not need it.
   assert.ok(found.find((c) => c.slug === 'vehement'));
+  teardown();
+});
+
+test('discovery reads LinkedIn\'s real aria-labels, in both UI languages', async () => {
+  // Regression: the first version anchored its regex at the start of the
+  // label, so "Click to stop following Acme Corp" matched nothing and scan()
+  // came back empty against the live page.
+  for (const locale of Object.keys(LOCALES)) {
+    const { page, LIU, teardown } = boot(FIXTURE, FAST, locale);
+    const found = await LIU.scan({ quiet: true });
+    assert.equal(found.length, 5, `${locale}: expected 5, got ${found.length}`);
+    assert.ok(
+      found.some((c) => c.name === 'Acme Corp'),
+      `${locale}: company name not recovered`,
+    );
+    // A button already in the follow state must not be picked up.
+    page.cards[0].btn.click();
+    const after = await LIU.scan({ quiet: true });
+    assert.equal(after.length, 4, `${locale}: unfollowed card still listed`);
+    teardown();
+  }
+});
+
+test('a company name is recovered from the aria-label when there is no link', async () => {
+  const { page, LIU, teardown } = boot();
+  // Strip the link, leaving only the button's aria-label to go on.
+  page.cards[0].link.remove();
+  const found = await LIU.scan({ quiet: true });
+  const acme = found.find((c) => c.name === 'Acme Corp');
+  assert.ok(acme, `name not recovered from aria-label: ${JSON.stringify(found.map(c => c.name))}`);
+  assert.equal(acme.slug, null, 'without a link there is no slug');
   teardown();
 });
 
@@ -83,7 +114,7 @@ test('dry run clicks absolutely nothing', async () => {
   restore();
   assert.equal(plan.length, 5);
   for (const { btn } of page.cards) {
-    assert.match(labelOf(btn), /^Takip ediliyor/, 'dry run must not flip any button');
+    assert.match(labelOf(btn), /^Click to stop following/, 'dry run must not flip any button');
   }
   teardown();
 });
@@ -97,9 +128,9 @@ test('confirmed run unfollows, respects limit, and is resumable', async () => {
 
   assert.equal(first.length, 2);
   assert.ok(first.every((r) => r.ok), JSON.stringify(first));
-  assert.match(labelOf(page.cards[0].btn), /^Takip et/);
-  assert.match(labelOf(page.cards[1].btn), /^Takip et/);
-  assert.match(labelOf(page.cards[2].btn), /^Takip ediliyor/);
+  assert.match(labelOf(page.cards[0].btn), /^Click to follow/);
+  assert.match(labelOf(page.cards[1].btn), /^Click to follow/);
+  assert.match(labelOf(page.cards[2].btn), /^Click to stop following/);
 
   // Second pass must skip the two already handled and pick up where it left off.
   const restore2 = quiet();
